@@ -1,0 +1,23 @@
+{
+    "name": "Game.Bootstrap",
+    "rootNamespace": "",
+    "references": [
+        "GUID:15f87daa26212c246b84ea3eee7bfa53",
+        "GUID:d137872992e2e4544bb30e6f3b9b7063",
+        "GUID:8206adce3cf98d74cb1805aa082b3f43",
+        "GUID:73f7ffe1962829648b05d7502943372b",
+        "GUID:6795b427e15356e47a9c7f79a7882352",
+        "GUID:60b6f61f16d459c468ea5d8b9b33ace6",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
