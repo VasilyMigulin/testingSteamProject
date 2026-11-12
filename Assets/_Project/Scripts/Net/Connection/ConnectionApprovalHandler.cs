@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Net.Connection
 {
-    // Host gate keeper: validate every connection requset and remember who was let in
+    // Host gatekeeper: validate every connection request and remember who was let in
     public sealed class ConnectionApprovalHandler : IDisposable
     {
         private readonly NetworkManager _networkManager;

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Game.Transport.Utp
 {
-    // Direct IP port connection via Unity Transport
+    // Direct IP:port connection via Unity Transport
     public sealed class UtpTransportAdapter : ITransportAdapter
     {
         public const ushort DefaultPort = 7777;
@@ -75,7 +75,7 @@ namespace Game.Transport.Utp
                 host = host[..colon];
             }
 
-            if (host.Equals("localHost", StringComparison.OrdinalIgnoreCase)) host = LocalAddress;
+            if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase)) host = LocalAddress;
 
             if (!IPAddress.TryParse(host, out _))
                 return false;
