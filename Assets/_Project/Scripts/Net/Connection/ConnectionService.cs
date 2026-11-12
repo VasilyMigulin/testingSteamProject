@@ -16,6 +16,7 @@ namespace Game.Net.Connection
         private readonly NetworkSettings _settings;
         private readonly CancellationTokenSource _lifetimeCts = new();
         private readonly ConnectionApprovalHandler _approval;
+        private CancellationTokenSource _operationCts;
 
         // Filled NGO callbacks while join async is waiting
         private ConnectResult? _pendingJoinResult;
@@ -62,12 +63,15 @@ namespace Game.Net.Connection
         {
             EnsureOffline();
             SetState(ConnectionState.Connecting);
+            CancellationTokenSource operation = BeginOperation(cancellationToken);
 
             try
             {
-                await WaitForShutdownAsync(cancellationToken);
+                CancellationToken ct = operation.Token;
 
-                ConnectResult prepared = await _transportAdapter.PrepareHostAsync(settings, cancellationToken);
+                await WaitForShutdownAsync(ct);
+
+                ConnectResult prepared = await _transportAdapter.PrepareHostAsync(settings, ct);
 
                 if (!prepared.Success) return Fail(prepared.FailReason);
 
@@ -85,18 +89,25 @@ namespace Game.Net.Connection
             {
                 return Fail(DisconnectReason.None);
             }
+            finally
+            {
+                EndOperation(operation);
+            }
         }
 
         public async Awaitable<ConnectResult> JoinAsync(string address, CancellationToken cancellationToken)
         {
             EnsureOffline();
             SetState(ConnectionState.Connecting);
+            CancellationTokenSource operation = BeginOperation(cancellationToken);
 
             try
             {
-                await WaitForShutdownAsync(cancellationToken);
+                CancellationToken ct = operation.Token;
 
-                ConnectResult prepared = await _transportAdapter.PrepareClientAsync(address, cancellationToken);
+                await WaitForShutdownAsync(ct);
+
+                ConnectResult prepared = await _transportAdapter.PrepareClientAsync(address, ct);
 
                 if (!prepared.Success) return Fail(prepared.FailReason);
 
@@ -106,7 +117,7 @@ namespace Game.Net.Connection
 
                 if (!_networkManager.StartClient()) return Fail(DisconnectReason.StartFailed);
 
-                ConnectResult result = await WaitForJoinResultAsync(cancellationToken);
+                ConnectResult result = await WaitForJoinResultAsync(ct);
 
                 if (!result.Success) return Fail(result.FailReason);
 
@@ -117,6 +128,24 @@ namespace Game.Net.Connection
             {
                 return Fail(DisconnectReason.None);
             }
+            finally
+            {
+                EndOperation(operation);
+            }
+        }
+
+        // Each host or join gets its own token so leave can abort it at any await point
+        private CancellationTokenSource BeginOperation(CancellationToken external)
+        {
+            _operationCts = CancellationTokenSource.CreateLinkedTokenSource(external, _lifetimeCts.Token);
+            return _operationCts;
+        }
+
+        private void EndOperation(CancellationTokenSource operation)
+        {
+            if (_operationCts == operation) _operationCts = null;
+
+            operation.Dispose();
         }
 
         // Polled every frame instead of cancel after timer callbacks run on a thread pool thread, 
@@ -184,6 +213,8 @@ namespace Game.Net.Connection
         private void Finish(DisconnectReason reason)
         {
             if (State == ConnectionState.Offline) return;
+
+            _operationCts?.Cancel();
 
             if (_networkManager.IsListening && !_networkManager.ShutdownInProgress) _networkManager.Shutdown();
 
