@@ -11,7 +11,7 @@ using VContainer.Unity;
 namespace Game.Bootstrap
 { 
     // Composition root: the only place that knows concrete transports and platforms.
-    public class RootLifetimeScope : LifetimeScope
+    public sealed class RootLifetimeScope : LifetimeScope
     {
         [SerializeField] private NetworkManager _networkManager; 
         [SerializeField] private UnityTransport _unityTransport;

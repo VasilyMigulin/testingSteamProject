@@ -1,12 +1,11 @@
 using Game.Transport.Utp;
 using System;
-using System.Globalization;
-using UnityEngine;
+using System.Globalization; 
 
 namespace Game.Bootstrap
 {
     // Command line: -name <player name> -port <port>
-    public class LaunchOptions
+    public sealed class LaunchOptions
     {
         public string PlayerName { get; private set; }
         public ushort Port { get; private set; } = UtpTransportAdapter.DefaultPort;
@@ -17,7 +16,7 @@ namespace Game.Bootstrap
         {
             var options = new LaunchOptions();
 
-            // Every option take value, so the last argument can't start one 
+            // Every option takes a value, so the last argument can't start one 
             for (int i = 0; i < args.Length - 1; i++)
             {
                 string value = args[i + 1];

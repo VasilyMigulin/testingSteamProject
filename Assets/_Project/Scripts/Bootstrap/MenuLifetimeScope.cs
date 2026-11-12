@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 namespace Game.Bootstrap
 {
-    public class MenuLifetimeScope : LifetimeScope
+    public sealed class MenuLifetimeScope : LifetimeScope
     {
         [SerializeField] private MenuView _menuView;
 
