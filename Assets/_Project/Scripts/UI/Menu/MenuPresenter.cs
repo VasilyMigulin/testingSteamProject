@@ -3,8 +3,7 @@ using Game.Shared.Interface;
 using System;
 using System.Threading;
 using UnityEngine;
-using VContainer.Unity;
-using static PlasticGui.PlasticTableColumn;
+using VContainer.Unity; 
 
 namespace Game.UI.Menu
 {
