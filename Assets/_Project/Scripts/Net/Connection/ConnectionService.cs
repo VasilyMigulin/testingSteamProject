@@ -15,6 +15,7 @@ namespace Game.Net.Connection
         private readonly IPlayerIdentityProvider _playerIdentity;
         private readonly NetworkSettings _settings;
         private readonly CancellationTokenSource _lifetimeCts = new();
+        private readonly ConnectionApprovalHandler _approvale;
 
         // Filled NGO callbacks while join async is waiting
         private ConnectResult? _pendingJoinResult;
@@ -27,12 +28,13 @@ namespace Game.Net.Connection
         public ConnectionState State { get; private set; } = ConnectionState.Offline;
         public DisconnectReason LastDisconnectReason { get; private set; }
 
-        public ConnectionService(NetworkManager networkManager, ITransportAdapter transport, IPlayerIdentityProvider identity, NetworkSettings settings)
+        public ConnectionService(NetworkManager networkManager, ITransportAdapter transport, IPlayerIdentityProvider identity, NetworkSettings settings, ConnectionApprovalHandler approval)
         {
             _networkManager = networkManager;
             _transportAdapter = transport;
             _playerIdentity = identity;
             _settings = settings;
+            _approvale = approval;
 
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
@@ -70,6 +72,8 @@ namespace Game.Net.Connection
                 if (!prepared.Success) return Fail(prepared.FailReason);
 
                 _networkManager.NetworkConfig.ConnectionData = CreatePayload();
+
+                _approvale.StartSession(settings.MaxPlayers);
 
                 if (!_networkManager.StartHost()) return Fail(DisconnectReason.StartFailed);
 
@@ -184,6 +188,8 @@ namespace Game.Net.Connection
             if (_networkManager.IsListening && !_networkManager.ShutdownInProgress) _networkManager.Shutdown();
 
             _transportAdapter.Cleanup();
+
+            _approvale.EndSession();
 
             IsHost = false;
 
