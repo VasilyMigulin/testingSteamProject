@@ -195,6 +195,7 @@ namespace Game.Net.Connection
         {
             if (State == state) return;
 
+            Debug.Log($"[Connection] {State} -> {state}");
             State = state;
 
             StateChanged?.Invoke(state);
@@ -213,6 +214,8 @@ namespace Game.Net.Connection
         private void Finish(DisconnectReason reason)
         {
             if (State == ConnectionState.Offline) return;
+
+            Debug.Log($"[Connection] Session finished, reason: {reason}");
 
             _operationCts?.Cancel();
 

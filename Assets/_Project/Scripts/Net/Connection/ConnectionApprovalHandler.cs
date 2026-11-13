@@ -48,6 +48,7 @@ namespace Game.Net.Connection
             if (response.Approved)
             {
                 _approvedPlayers[request.ClientNetworkId] = payload;
+                Debug.Log($"[Approval] Client {request.ClientNetworkId} approved: {payload.PlayerName} ({payload.PlayerId})");
                 return;
             }
 
@@ -88,6 +89,9 @@ namespace Game.Net.Connection
         {
             if (_networkManager.IsServer)
                 _approvedPlayers.Remove(clientId);
+
+            if (_networkManager.IsServer && _approvedPlayers.Remove(clientId))
+                Debug.Log($"[Approval] Client {clientId} left"); 
         }
 
         public void Dispose()
