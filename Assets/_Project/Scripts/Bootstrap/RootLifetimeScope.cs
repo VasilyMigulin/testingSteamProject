@@ -1,4 +1,6 @@
 using Game.Net.Connection;
+using Game.Net.Injection;
+using Game.Net.Session;
 using Game.Platform.Local;
 using Game.Shared.Interface;
 using Game.Transport.Utp;
@@ -36,7 +38,10 @@ namespace Game.Bootstrap
             RegisterTransport(builder, options);
 
             builder.Register<ConnectionApprovalHandler>(Lifetime.Singleton);
-            builder.Register<ConnectionService>(Lifetime.Singleton).As<IConnectionService>();
+            builder.Register<ConnectionService>(Lifetime.Singleton).As<IConnectionService>(); 
+            builder.Register<PlayerRegistry>(Lifetime.Singleton).AsSelf().As<IPlayerRegistry>();
+            builder.RegisterEntryPoint<SessionFlow>();
+            builder.RegisterEntryPoint<NetworkPrefabInjector>();
 
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }

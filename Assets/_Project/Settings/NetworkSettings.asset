@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: NetworkSettings
   m_EditorClassIdentifier: Game.Net::Game.Net.Connection.NetworkSettings
   _connectTimeoutSeconds: 10
+  _sessionStatePrefab: {fileID: 3659838233841870711, guid: 6db3d2dd8178e674b865820610ed973c, type: 3}

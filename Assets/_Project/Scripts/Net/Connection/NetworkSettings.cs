@@ -1,3 +1,4 @@
+using Game.Net.Session;
 using UnityEngine;
 
 namespace Game.Net.Connection
@@ -6,6 +7,8 @@ namespace Game.Net.Connection
     public sealed class NetworkSettings : ScriptableObject
     {
         [SerializeField, Min(1f)] private float _connectTimeoutSeconds = 10f;
-        public float ConnectTimeoutSeconds => _connectTimeoutSeconds;
+        public float ConnectTimeoutSeconds => _connectTimeoutSeconds; 
+        [SerializeField] private SessionState _sessionStatePrefab;
+        public SessionState SessionStatePrefab => _sessionStatePrefab;
     }
 }

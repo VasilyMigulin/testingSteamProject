@@ -11,8 +11,7 @@ namespace Game.UI.Menu
     {
         private const int DefaultMaxPlayers = 4;
         private readonly MenuView _view;
-        private readonly IConnectionService _connection;
-        private readonly CancellationTokenSource _lifetimeCts = new();
+        private readonly IConnectionService _connection; 
 
         public MenuPresenter(MenuView view, IConnectionService connection)
         {
@@ -31,9 +30,7 @@ namespace Game.UI.Menu
         }
 
         public void Dispose()
-        {
-            _lifetimeCts.Cancel();
-            _lifetimeCts.Dispose();
+        { 
             _view.HostClicked -= OnHostClicked;
             _view.JoinClicked -= OnJoinClicked;
             _view.LeaveClicked -= OnLeaveClicked;
@@ -45,7 +42,7 @@ namespace Game.UI.Menu
             try
             {
                 var settings = new HostSettings("Session", DefaultMaxPlayers, SessionVisibility.FriendsOnly);
-                await _connection.HostAsync(settings, _lifetimeCts.Token); 
+                await _connection.HostAsync(settings, CancellationToken.None); 
             }
             catch (Exception e)
             {
@@ -57,7 +54,7 @@ namespace Game.UI.Menu
         {
             try
             {
-                await _connection.JoinAsync(address, _lifetimeCts.Token);
+                await _connection.JoinAsync(address, CancellationToken.None);
             }
             catch (Exception e)
             {
