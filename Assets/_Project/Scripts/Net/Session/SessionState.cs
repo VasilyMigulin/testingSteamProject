@@ -82,7 +82,7 @@ namespace Game.Net.Session
                 case SceneEventType.LoadEventCompleted:
                     SetAllLoading(false);
                     foreach (ulong clientId in sceneEvent.ClientsThatTimedOut)
-                        Debug.LogWarning($"[Session] Client {clientId} did not finish loading {sceneEvent.SceneName}");
+                        Debug.LogWarning($"[Session] Client {clientId} timed out or disconnected while loading {sceneEvent.SceneName}"); 
                     break;
 
             }

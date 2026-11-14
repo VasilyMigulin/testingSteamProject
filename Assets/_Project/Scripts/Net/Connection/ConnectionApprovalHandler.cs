@@ -87,11 +87,8 @@ namespace Game.Net.Connection
 
         private void OnClientDisconnected(ulong clientId)
         {
-            if (_networkManager.IsServer)
-                _approvedPlayers.Remove(clientId);
-
             if (_networkManager.IsServer && _approvedPlayers.Remove(clientId))
-                Debug.Log($"[Approval] Client {clientId} left"); 
+                Debug.Log($"[Approval] Client {clientId} left");
         }
 
         public void Dispose()
