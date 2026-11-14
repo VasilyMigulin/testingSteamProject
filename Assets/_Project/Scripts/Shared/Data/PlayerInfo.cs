@@ -10,7 +10,8 @@ namespace Game.Shared.Data
         public readonly bool IsHost;
         public readonly bool IsLocal; 
         public readonly bool IsLoading;
-        public PlayerInfo(ulong clientId, string playerId, string name, bool isHost, bool isLocal, bool isLoading)
+        public readonly int PingMs;
+        public PlayerInfo(ulong clientId, string playerId, string name, bool isHost, bool isLocal, bool isLoading, int ping)
         {
             ClientId = clientId;
             PlayerId = playerId;
@@ -18,6 +19,7 @@ namespace Game.Shared.Data
             IsHost = isHost;
             IsLocal = isLocal;
             IsLoading = isLoading;
+            PingMs = ping;
         }
     }
 }

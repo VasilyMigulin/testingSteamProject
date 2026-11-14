@@ -11,7 +11,7 @@ namespace Game.Net.Session
     {
         // FixedString64Bytes holds up to 61 UTF-8 bytes.
         private const int MaxNameLength = 24;
-
+        public ushort RttMs;
         public ulong ClientId;
         public FixedString64Bytes PlayerId;
         public FixedString64Bytes Name; 
@@ -22,6 +22,7 @@ namespace Game.Net.Session
             ClientId = clientId;
             PlayerId = new FixedString64Bytes(playerId);
             IsLoading = isLoading;
+            RttMs = 0;
             Name = new FixedString64Bytes(name.Length > MaxNameLength ? name.Substring(0, MaxNameLength) : name);
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -30,11 +31,12 @@ namespace Game.Net.Session
             serializer.SerializeValue(ref PlayerId);
             serializer.SerializeValue(ref Name);
             serializer.SerializeValue(ref IsLoading);
+            serializer.SerializeValue(ref RttMs);
         }
 
         public bool Equals(PlayerNetworkData other)
         {
-            return ClientId == other.ClientId && PlayerId.Equals(other.PlayerId) && Name.Equals(other.Name) && IsLoading == other.IsLoading;
+            return ClientId == other.ClientId && PlayerId.Equals(other.PlayerId) && Name.Equals(other.Name) && IsLoading == other.IsLoading && RttMs == other.RttMs;
         }
 
         public PlayerInfo ToInfo(ulong localClientId) => new
@@ -44,7 +46,8 @@ namespace Game.Net.Session
             Name.ToString(),
             ClientId == NetworkManager.ServerClientId,
             ClientId == localClientId,
-            IsLoading
+            IsLoading,
+            RttMs
         );
     }
 }

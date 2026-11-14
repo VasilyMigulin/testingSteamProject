@@ -47,7 +47,8 @@ namespace Game.Bootstrap
             builder.Register<ItemAuthority>(Lifetime.Singleton);
             builder.Register<ConnectionService>(Lifetime.Singleton).As<IConnectionService>(); 
             builder.Register<PlayerRegistry>(Lifetime.Singleton).AsSelf().As<IPlayerRegistry>();
-            builder.Register<InteractionHintState>(Lifetime.Singleton).AsSelf().As<IInteractionHint>();
+            builder.Register<InteractionHintState>(Lifetime.Singleton).AsSelf().As<IInteractionHint>(); 
+            builder.Register<PlayerModeration>(Lifetime.Singleton).As<IPlayerModeration>();
             builder.Register<GameInput>(Lifetime.Singleton).As<IGameInput>().WithParameter(_inputActions);
             builder.RegisterEntryPoint<SessionFlow>();
             builder.RegisterEntryPoint<SceneLoadingService>();

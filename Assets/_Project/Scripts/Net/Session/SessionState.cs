@@ -16,6 +16,13 @@ namespace Game.Net.Session
         private PlayerRegistry _registry;
         private ConnectionApprovalHandler _approval;
 
+        private const float PingUpdateInterval = 1f;
+
+        // Smaller changes are not worth a network update.
+        private const int PingChangeThresholdMs = 5;
+        private float _nextPingUpdate;
+
+
         [Inject]
         public void Construct(PlayerRegistry registry, ConnectionApprovalHandler approval)
         {
@@ -26,6 +33,31 @@ namespace Game.Net.Session
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+        }
+         
+        private void Update()
+        {
+            if (!IsServer || Time.unscaledTime < _nextPingUpdate) return;
+
+            _nextPingUpdate = Time.unscaledTime + PingUpdateInterval;
+            UpdatePings();
+        }
+
+        private void UpdatePings()
+        { 
+            NetworkTransport transport = NetworkManager.NetworkConfig.NetworkTransport;
+
+            for (int i = 0; i < _players.Count; i++)
+            {
+                PlayerNetworkData player = _players[i];
+                ulong rtt = player.ClientId == NetworkManager.ServerClientId ? 0 : transport.GetCurrentRtt(player.ClientId);
+                var rttMs = (ushort)Mathf.Min(rtt, ushort.MaxValue);
+
+                if (Mathf.Abs(rttMs - player.RttMs) < PingChangeThresholdMs) continue;
+
+                player.RttMs = rttMs;
+                _players[i] = player;
+            }
         }
 
         public override void OnNetworkSpawn()

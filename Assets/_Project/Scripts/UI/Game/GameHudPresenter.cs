@@ -1,5 +1,4 @@
-using System;
-using System.Text;
+using System; 
 using Game.Shared.Data;
 using Game.Shared.Interface;
 using Game.UI.Common;
@@ -10,26 +9,31 @@ namespace Game.UI.Game
     // Player list (hold tab or open pause) and pause menu with leave 
     public sealed class GameHudPresenter : IStartable, ITickable, IDisposable
     {
+        private readonly PlayerListView _list;
         private readonly GameHudView _view;
         private readonly IGameInput _input;
         private readonly IPlayerRegistry _players;
         private readonly IConnectionService _connection;
         private readonly IInteractionHint _hint;
+        private readonly IPlayerModeration _moderation;
         private bool _paused;
-         
-        public GameHudPresenter(GameHudView view, IGameInput input, IPlayerRegistry players, IConnectionService connection, IInteractionHint hint)
+
+        public GameHudPresenter(GameHudView view, PlayerListView list, IGameInput input, IPlayerRegistry players, IConnectionService connection, IPlayerModeration moderation, IInteractionHint hint)
         { 
             _view = view;
             _input = input;
             _players = players;
             _hint = hint;
             _connection = connection;
+            _list = list;
+            _moderation = moderation;
         }
 
         public void Start()
         { 
             _view.LeaveClicked += _connection.Leave;
-            _players.Changed += RenderPlayers;
+            _players.Changed += RenderPlayers; 
+            _list.KickClicked += _moderation.Kick;
 
             _hint.Changed += RenderHint;
             RenderHint(_hint.Current);
@@ -53,21 +57,14 @@ namespace Game.UI.Game
             _view.SetCrosshairVisible(!paused);
         }
 
-        private void RenderPlayers()
-        { 
-            var text = new StringBuilder();
-
-            foreach (PlayerInfo player in _players.Players)
-                text.AppendLine(PlayerLabel.Format(player));
-
-            _view.SetPlayerList(text.ToString());
-        }
+        private void RenderPlayers() => _list.Render(PlayerRows.Build(_players.Players, _moderation.CanKick));
 
         public void Dispose()
         { 
             _view.LeaveClicked -= _connection.Leave;
             _players.Changed -= RenderPlayers;
-            _hint.Changed -= RenderHint;
+            _hint.Changed -= RenderHint; 
+            _list.KickClicked -= _moderation.Kick;
 
             // Leaving the game scene: give the cursor back to the menus.
             _input.SetGameplayEnabled(false);
