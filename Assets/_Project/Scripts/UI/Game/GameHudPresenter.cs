@@ -14,14 +14,15 @@ namespace Game.UI.Game
         private readonly IGameInput _input;
         private readonly IPlayerRegistry _players;
         private readonly IConnectionService _connection;
-         
+        private readonly IInteractionHint _hint;
         private bool _paused;
          
-        public GameHudPresenter(GameHudView view, IGameInput input, IPlayerRegistry players, IConnectionService connection)
+        public GameHudPresenter(GameHudView view, IGameInput input, IPlayerRegistry players, IConnectionService connection, IInteractionHint hint)
         { 
             _view = view;
             _input = input;
             _players = players;
+            _hint = hint;
             _connection = connection;
         }
 
@@ -29,6 +30,9 @@ namespace Game.UI.Game
         { 
             _view.LeaveClicked += _connection.Leave;
             _players.Changed += RenderPlayers;
+
+            _hint.Changed += RenderHint;
+            RenderHint(_hint.Current);
 
             RenderPlayers();
             SetPaused(false);
@@ -45,7 +49,8 @@ namespace Game.UI.Game
         {
             _paused = paused;
             _view.SetPauseVisible(paused);
-            _input.SetGameplayEnabled(!paused);  
+            _input.SetGameplayEnabled(!paused);
+            _view.SetCrosshairVisible(!paused);
         }
 
         private void RenderPlayers()
@@ -62,9 +67,17 @@ namespace Game.UI.Game
         { 
             _view.LeaveClicked -= _connection.Leave;
             _players.Changed -= RenderPlayers;
-             
+            _hint.Changed -= RenderHint;
+
             // Leaving the game scene: give the cursor back to the menus.
             _input.SetGameplayEnabled(false);
         }
+
+        private void RenderHint(InteractionHint hint) => _view.SetHint(hint switch
+        {
+            InteractionHint.CanGrab => "[E] Grab",
+            InteractionHint.Holding => "[E] Drop    [LMB] Throw    [X] Delete",
+            _ => "[F] Spawn crate"
+        });
     }
 }

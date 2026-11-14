@@ -115,6 +115,26 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "SpawnItem",
+                    "type": "Button",
+                    "id": "745f7856-097d-4450-bf9d-a2739cf77f2f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "DeleteItem",
+                    "type": "Button",
+                    "id": "44ac6bfe-3194-4162-bd9b-efb7559c1ddf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -522,6 +542,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0bcdaf49-6194-4c57-877b-1bff534af7c1",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpawnItem",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d50f3b6b-8c5f-4abb-84ec-4f5e7e1d04a2",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DeleteItem",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

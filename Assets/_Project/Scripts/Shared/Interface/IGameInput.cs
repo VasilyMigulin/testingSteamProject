@@ -10,7 +10,12 @@ namespace Game.Shared.Interface
         bool JumpPressed { get; }
         bool PlayerListHeld { get; }
         bool PausePressed { get; }
-         
+        bool InteractPressed { get; }    // E: grab / drop
+        bool ThrowPressed { get; }       // LMB
+        bool SpawnItemPressed { get; }   // F
+        bool DeleteItemPressed { get; }  // X
+
+
         // Disables character control and frees the cursor (e.g. while a menu is open).
         void SetGameplayEnabled(bool enabled);
     }
