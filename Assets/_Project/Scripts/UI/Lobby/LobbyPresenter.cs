@@ -1,7 +1,8 @@
-using System;
-using System.Collections.Generic;
 using Game.Shared.Data;
 using Game.Shared.Interface;
+using Game.UI.Common;
+using System;
+using System.Collections.Generic;
 using VContainer.Unity;
 
 namespace Game.UI.Lobby
@@ -28,34 +29,16 @@ namespace Game.UI.Lobby
 
             _view.SetCanStart(_connection.IsHost);
             Render();
-        }
-
+        } 
 
         private void Render()
         {
             var lines = new List<string>(_players.Players.Count);
             foreach (PlayerInfo player in _players.Players)
-                lines.Add(Format(player));
+                lines.Add(PlayerLabel.Format(player));
 
             _view.SetPlayers(lines); 
-        }
-
-        private static string Format(PlayerInfo playerInfo)
-        {
-            string line = playerInfo.Name;
-
-            if (playerInfo.IsHost)
-            {
-                line += " (host)";
-            }
-
-            if (playerInfo.IsLocal)
-            {
-                line += " (you)";
-            }
-
-            return line;
-        }
+        } 
 
         public void Dispose()
         {

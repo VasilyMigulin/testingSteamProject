@@ -1,3 +1,4 @@
+using Game.Gameplay.Input;
 using Game.Net.Connection;
 using Game.Net.Injection;
 using Game.Net.Session;
@@ -8,6 +9,7 @@ using Game.UI.Loading;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -20,6 +22,7 @@ namespace Game.Bootstrap
         [SerializeField] private UnityTransport _unityTransport;
         [SerializeField] private NetworkSettings _networkSettings;
         [SerializeField] private LoadingScreenView _loadingScreenView;
+        [SerializeField] private InputActionAsset _inputActions; 
         protected override void Awake()
         {
             // Lives for the whole session; scene scopes use it as their parent 
@@ -41,6 +44,7 @@ namespace Game.Bootstrap
             builder.Register<ConnectionApprovalHandler>(Lifetime.Singleton);
             builder.Register<ConnectionService>(Lifetime.Singleton).As<IConnectionService>(); 
             builder.Register<PlayerRegistry>(Lifetime.Singleton).AsSelf().As<IPlayerRegistry>();
+            builder.Register<GameInput>(Lifetime.Singleton).As<IGameInput>().WithParameter(_inputActions);
             builder.RegisterEntryPoint<SessionFlow>();
             builder.RegisterEntryPoint<SceneLoadingService>();
             builder.RegisterComponent(_loadingScreenView);
