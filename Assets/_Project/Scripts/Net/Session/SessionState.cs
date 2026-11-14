@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Game.Net.Connection;
 using Game.Shared.Data;
 using Unity.Netcode;
+using UnityEngine;
 using VContainer;
 
 namespace Game.Net.Session
@@ -39,7 +40,8 @@ namespace Game.Net.Session
 
 
                 NetworkManager.OnClientConnectedCallback += AddPlayer;
-                NetworkManager.OnClientDisconnectCallback += RemovePlayer;
+                NetworkManager.OnClientDisconnectCallback += RemovePlayer; 
+                NetworkManager.SceneManager.OnSceneEvent += OnServerSceneEvent;
             }
 
             PublishPlayers();
@@ -53,11 +55,68 @@ namespace Game.Net.Session
             {
                 NetworkManager.OnClientConnectedCallback -= AddPlayer;
                 NetworkManager.OnClientDisconnectCallback -= RemovePlayer;
+
+                // SceneManager can already be gone during shutdown.
+                if (NetworkManager.SceneManager != null)
+                    NetworkManager.SceneManager.OnSceneEvent -= OnServerSceneEvent;
             }
 
             _registry.Clear();
         }
-         
+
+        // Host-side: replicates who is still loading, so every player can see whom the session waits for.
+        private void OnServerSceneEvent(SceneEvent sceneEvent)
+        {
+            switch (sceneEvent.SceneEventType)
+            {
+                case SceneEventType.Load when sceneEvent.ClientId == NetworkManager.ServerClientId:
+                    SetAllLoading(true); 
+                    Debug.Log($"[Session] Loading {sceneEvent.SceneName} started at {Time.realtimeSinceStartup:F2}");
+                    break;
+                case SceneEventType.LoadComplete:
+                    Debug.Log($"[Session] Client {sceneEvent.ClientId} finished loading {sceneEvent.SceneName} at {Time.realtimeSinceStartup:F2}");
+                    SetLoading(sceneEvent.ClientId, false);
+                    break;
+
+                // Also covers clients that disconnected or timed out during the load.
+                case SceneEventType.LoadEventCompleted:
+                    SetAllLoading(false);
+                    foreach (ulong clientId in sceneEvent.ClientsThatTimedOut)
+                        Debug.LogWarning($"[Session] Client {clientId} did not finish loading {sceneEvent.SceneName}");
+                    break;
+
+            }
+        }
+
+        private void SetLoading(ulong clientId, bool isLoading)
+        { 
+            for (int i = 0; i < _players.Count; i++)
+            {
+                if (_players[i].ClientId == clientId)
+                {
+                    SetLoadingAt(i, isLoading);
+                    return;
+                }
+            }
+        }
+
+        private void SetAllLoading(bool isLoading)
+        {
+            for (int i = 0; i < _players.Count; i++)
+                SetLoadingAt(i, isLoading);
+        }
+
+        // Elements are structs: copy, modify, write back. Assigning marks the element dirty for replication.
+        private void SetLoadingAt(int index, bool isLoading)
+        { 
+            PlayerNetworkData player = _players[index];
+
+            if (player.IsLoading == isLoading) return;
+
+            player.IsLoading = isLoading;
+            _players[index] = player;
+        }
+
         private void AddPlayer(ulong clientId)
         {
             if (!_approval.TryGetPlayer(clientId, out ConnectionPayload payload)) return;

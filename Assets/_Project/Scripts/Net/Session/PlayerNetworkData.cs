@@ -14,12 +14,14 @@ namespace Game.Net.Session
 
         public ulong ClientId;
         public FixedString64Bytes PlayerId;
-        public FixedString64Bytes Name;
+        public FixedString64Bytes Name; 
+        public bool IsLoading;
 
-        public PlayerNetworkData(ulong clientId, string playerId, string name)
+        public PlayerNetworkData(ulong clientId, string playerId, string name, bool isLoading = false)
         {
             ClientId = clientId;
             PlayerId = new FixedString64Bytes(playerId);
+            IsLoading = isLoading;
             Name = new FixedString64Bytes(name.Length > MaxNameLength ? name.Substring(0, MaxNameLength) : name);
         }
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -27,11 +29,12 @@ namespace Game.Net.Session
             serializer.SerializeValue(ref ClientId);
             serializer.SerializeValue(ref PlayerId);
             serializer.SerializeValue(ref Name);
+            serializer.SerializeValue(ref IsLoading);
         }
 
         public bool Equals(PlayerNetworkData other)
         {
-            return ClientId == other.ClientId && PlayerId.Equals(other.PlayerId) && Name.Equals(other.Name);
+            return ClientId == other.ClientId && PlayerId.Equals(other.PlayerId) && Name.Equals(other.Name) && IsLoading == other.IsLoading;
         }
 
         public PlayerInfo ToInfo(ulong localClientId) => new
@@ -40,7 +43,8 @@ namespace Game.Net.Session
             PlayerId.ToString(),
             Name.ToString(),
             ClientId == NetworkManager.ServerClientId,
-            ClientId == localClientId
+            ClientId == localClientId,
+            IsLoading
         );
     }
 }

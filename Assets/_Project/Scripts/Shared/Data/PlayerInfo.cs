@@ -8,14 +8,16 @@ namespace Game.Shared.Data
         public readonly string PlayerId; 
         public readonly string Name;
         public readonly bool IsHost;
-        public readonly bool IsLocal;
-        public PlayerInfo(ulong clientId, string playerId, string name, bool isHost, bool isLocal)
+        public readonly bool IsLocal; 
+        public readonly bool IsLoading;
+        public PlayerInfo(ulong clientId, string playerId, string name, bool isHost, bool isLocal, bool isLoading)
         {
             ClientId = clientId;
             PlayerId = playerId;
             Name = name;
             IsHost = isHost;
             IsLocal = isLocal;
+            IsLoading = isLoading;
         }
     }
 }
