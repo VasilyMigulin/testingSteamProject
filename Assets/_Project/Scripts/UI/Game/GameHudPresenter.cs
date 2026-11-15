@@ -74,7 +74,7 @@ namespace Game.UI.Game
         {
             InteractionHint.CanGrab => "[E] Grab",
             InteractionHint.Holding => "[E] Drop    [LMB] Throw    [X] Delete",
-            _ => "[F] Spawn crate"
+            _ => "[F] Spawn crate    [C] Change color"
         });
     }
 }

@@ -16,6 +16,7 @@ namespace Game.Gameplay.Input
         private readonly InputAction _interact;
         private readonly InputAction _throw;
         private readonly InputAction _spawnItem;
+        private readonly InputAction _colorChange;
         private readonly InputAction _deleteItem;
         private bool _gameplayEnabled;
 
@@ -31,6 +32,7 @@ namespace Game.Gameplay.Input
             _throw = _playerMap.FindAction("Attack", throwIfNotFound: true);
             _spawnItem = _playerMap.FindAction("SpawnItem", throwIfNotFound: true);
             _deleteItem = _playerMap.FindAction("DeleteItem", throwIfNotFound: true);
+            _colorChange = _playerMap.FindAction("ChangeColor", throwIfNotFound: true);
             _playerMap.Enable();
         }
 
@@ -43,6 +45,7 @@ namespace Game.Gameplay.Input
         public bool ThrowPressed => _gameplayEnabled && _throw.WasPressedThisFrame();
         public bool SpawnItemPressed => _gameplayEnabled && _spawnItem.WasPressedThisFrame();
         public bool DeleteItemPressed => _gameplayEnabled && _deleteItem.WasPressedThisFrame();
+        public bool ChangeColorPressed => _gameplayEnabled && _colorChange.WasPressedThisFrame(); 
 
         public void SetGameplayEnabled(bool enabled)
         {

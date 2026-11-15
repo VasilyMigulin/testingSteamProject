@@ -14,6 +14,7 @@ namespace Game.Shared.Interface
         bool ThrowPressed { get; }       // LMB
         bool SpawnItemPressed { get; }   // F
         bool DeleteItemPressed { get; }  // X
+        bool ChangeColorPressed { get; } // C
 
 
         // Disables character control and frees the cursor (e.g. while a menu is open).
