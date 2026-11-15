@@ -15,7 +15,8 @@ namespace Game.UI.Lobby
         private readonly IPlayerRegistry _players;
         private readonly IConnectionService _connection;
         private readonly ISessionFlow _session;
-        public LobbyPresenter(LobbyView view, IPlayerRegistry players, IConnectionService connection, ISessionFlow session, PlayerListView playerListView, IPlayerModeration moderation)
+        private readonly ISessionInvites _invites;
+        public LobbyPresenter(LobbyView view, IPlayerRegistry players, IConnectionService connection, ISessionFlow session, PlayerListView playerListView, IPlayerModeration moderation, ISessionInvites invites)
         {
             _view = view;
             _players = players;
@@ -23,6 +24,7 @@ namespace Game.UI.Lobby
             _session = session;
             _playerListView = playerListView;
             _moderation = moderation;
+            _invites = invites;
         }
 
         public void Start()
@@ -33,6 +35,10 @@ namespace Game.UI.Lobby
             _playerListView.KickClicked += _moderation.Kick;
 
             _view.SetCanStart(_connection.IsHost);
+            _view.InviteClicked += _invites.OpenInviteDialog;
+            // An IP address is only meaningful from the host; a Steam lobby id can be shared by anyone in it.
+            bool showCode = _connection.IsHost || _invites.CanInvite;
+            _view.SetInvite(_invites.CanInvite, showCode ? _invites.SessionCode : string.Empty);
             Render();
         }
 
@@ -43,6 +49,7 @@ namespace Game.UI.Lobby
             _view.StartClicked -= _session.StartGame;
             _playerListView.KickClicked -= _moderation.Kick;
             _view.LeaveClicked -= _connection.Leave;
+            _view.InviteClicked -= _invites.OpenInviteDialog;
             _players.Changed -= Render;
         }
     }

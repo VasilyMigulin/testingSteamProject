@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace Netcode.Transports
 {
+    // Vendored from github.com/Unity-Technologies/multiplayer-community-contributions (MIT). Changes: GetCurrentRtt.
     public class SteamNetworkingSocketsTransport : NetworkTransport
     {
         #region Internal Object Model
@@ -94,27 +95,42 @@ namespace Netcode.Transports
             connectionMapping.Remove(clientId);
         }
 
+        // Changed from the original, which always returned 0 (TODO in the source): real RTT from Steam.
+        // NGO uses it for time sync, and the game shows it in the player list.
         public override ulong GetCurrentRtt(ulong clientId)
+        { 
+            if (!TryGetConnection(clientId, out HSteamNetConnection connection)) return 0ul;
+
+            var status = new SteamNetConnectionRealTimeStatus_t();
+            var lanes = new SteamNetConnectionRealTimeLaneStatus_t(); 
+
+            EResult result = SteamNetworkingSockets.GetConnectionRealTimeStatus(connection, ref status, 0, ref lanes);
+
+            return result == EResult.k_EResultOK && status.m_nPing > 0 ? (ulong)status.m_nPing : 0ul; 
+        }
+
+        private bool TryGetConnection(ulong clientId, out HSteamNetConnection connection)
         {
-            if (isServer)
+            connection = default;
+
+            if (!isServer)
             {
-                if (connectionMapping.ContainsKey(clientId))
-                {
-                    //TODO: We need to figure out how Valve expects you to use ISteamNetworkingUtils ... the issue is no one thought to document WTF a SteamNetworkingPingLocation was or how to get them
-                    return 0ul;
-                }
-                else
-                {
-                    if (NetworkManager.Singleton.LogLevel <= LogLevel.Error)
-                        NetworkLog.LogErrorServer(nameof(SteamNetworkingSocketsTransport) + " - Can't GetCurrentRtt from client, client not connected, clientId: " + clientId);
-                }
-            }
-            else
-            {
-                return 0ul;
+                if (serverUser == null) return false;
+
+                connection = serverUser.connection;
+
+                return true;
             }
 
-            return 0ul;
+            if (connectionMapping.TryGetValue(clientId, out SteamConnectionData data) ||
+                 (NetworkManager.Singleton != null &&
+                 connectionMapping.TryGetValue(NetworkManager.Singleton.GetTransportIdFromClientId(clientId), out data)))
+            {
+                connection = data.connection;
+                return true;
+            }
+
+            return false;
         }
 
         public override void Initialize(NetworkManager networkManager = null)

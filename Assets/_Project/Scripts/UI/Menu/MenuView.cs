@@ -1,3 +1,4 @@
+using Game.Shared.Data;
 using System;
 using TMPro; 
 using UnityEngine;
@@ -12,6 +13,17 @@ namespace Game.UI.Menu
         [SerializeField] private Button _joinButton;
         [SerializeField] private Button _leaveButton;
         [SerializeField] private TMP_Text _statusText;
+
+        [SerializeField] private TMP_InputField _sessionNameInput;
+        [SerializeField] private TMP_Dropdown _maxPlayersDropdown;   // options: 2, 3, 4
+        [SerializeField] private TMP_Dropdown _visibilityDropdown;   // options: Friends only, Private
+        [SerializeField] private TMP_Text _addressPlaceholder;
+
+        private const int MinPlayers = 2;
+         
+        public string SessionName => string.IsNullOrWhiteSpace(_sessionNameInput.text) ? "Session" : _sessionNameInput.text.Trim();
+        public int MaxPlayers => MinPlayers + _maxPlayersDropdown.value; 
+        public SessionVisibility Visibility => (SessionVisibility)_visibilityDropdown.value;
 
         public event Action HostClicked;
         public event Action<string> JoinClicked; 
@@ -33,5 +45,12 @@ namespace Game.UI.Menu
         }
 
         public void SetStatus(string text) => _statusText.text = text;
+         
+        public void SetSteamMode(bool isSteam)
+        {
+            // Visibility only exists for Steam lobbies.
+            _visibilityDropdown.gameObject.SetActive(isSteam);
+            _addressPlaceholder.text = isSteam ? "Steam lobby ID" : "IP:port"; 
+        }
     }
 }

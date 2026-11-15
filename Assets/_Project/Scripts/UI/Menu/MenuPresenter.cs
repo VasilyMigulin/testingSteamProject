@@ -8,8 +8,7 @@ using VContainer.Unity;
 namespace Game.UI.Menu
 {
     public sealed class MenuPresenter : IStartable, IDisposable
-    {
-        private const int DefaultMaxPlayers = 4;
+    { 
         private readonly MenuView _view;
         private readonly IConnectionService _connection;
         private readonly IPlatformInfo _platform;
@@ -28,6 +27,8 @@ namespace Game.UI.Menu
             _connection.StateChanged += Render;
 
             Render(_connection.State);
+                
+            _view.SetSteamMode(_platform.IsSteam);
         }
 
         public void Dispose()
@@ -42,7 +43,7 @@ namespace Game.UI.Menu
         {
             try
             {
-                var settings = new HostSettings("Session", DefaultMaxPlayers, SessionVisibility.FriendsOnly);
+                var settings = new HostSettings(_view.SessionName, _view.MaxPlayers, _view.Visibility);
                 await _connection.HostAsync(settings, CancellationToken.None); 
             }
             catch (Exception e)
