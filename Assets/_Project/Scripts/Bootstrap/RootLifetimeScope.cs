@@ -70,8 +70,7 @@ namespace Game.Bootstrap
             builder.RegisterComponent(_loadingScreenView);
             builder.RegisterInstance(_itemSettings);
             builder.RegisterEntryPoint<LoadingScreenPresenter>();
-            builder.RegisterEntryPoint<NetworkPrefabInjector>(); 
-
+            builder.RegisterEntryPoint<NetworkPrefabInjector>();  
 
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }
@@ -104,6 +103,8 @@ namespace Game.Bootstrap
             builder.Register<GuidIdentityProvider>(Lifetime.Singleton)
                 .As<IPlayerIdentityProvider>()
                 .WithParameter("displayNameOverride", options.PlayerName);
+
+            builder.Register<LogAchievementService>(Lifetime.Singleton).As<IAchievementService>();
         }
 
         private void RegisterTransport(IContainerBuilder builder, LaunchOptions options)

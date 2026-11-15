@@ -28,8 +28,9 @@ namespace Game.Platform.Steam
         private string _launchLobbyId;
 
         public CSteamID CurrentLobby { get; private set; } = CSteamID.Nil;
-         
-        public bool CanInvite => CurrentLobby.IsValid();
+
+        public bool CanInvite => CurrentLobby.IsValid(); 
+        public int MaxPlayers => CurrentLobby.IsValid() ? SteamMatchmaking.GetLobbyMemberLimit(CurrentLobby) : 0;
         public string SessionCode => CurrentLobby.IsValid() ? CurrentLobby.m_SteamID.ToString() : string.Empty; 
         private bool IsOwner() => SteamMatchmaking.GetLobbyOwner(CurrentLobby) == SteamUser.GetSteamID();
         private static ELobbyType ToLobbyType(SessionVisibility visibility) => visibility == SessionVisibility.Private

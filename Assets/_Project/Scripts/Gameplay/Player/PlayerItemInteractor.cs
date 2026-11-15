@@ -15,7 +15,8 @@ namespace Game.Gameplay.Player
         [SerializeField] private Transform _holdPoint;
         [SerializeField] private LayerMask _itemMask;
          
-        private IGameInput _input;
+        private IGameInput _input; 
+        private IAchievementService _achievements;
         private ItemAuthority _authority;
         private ItemSettings _settings; 
         private InteractionHintState _hint; 
@@ -27,12 +28,13 @@ namespace Game.Gameplay.Player
         private bool IsHolding => _targetItem != null && _targetItem.IsSpawned && _targetItem.HolderId == OwnerClientId;
         
         [Inject]
-        public void Construct(IGameInput input, ItemAuthority authority, ItemSettings settings, InteractionHintState hint)
+        public void Construct(IGameInput input, ItemAuthority authority, ItemSettings settings, InteractionHintState hint, IAchievementService achievementService)
         { 
             _input = input;
             _authority = authority;
             _settings = settings;
             _hint = hint;
+            _achievements = achievementService;
         } 
 
         private void Awake() => enabled = false;
@@ -129,9 +131,17 @@ namespace Game.Gameplay.Player
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-        private void ReleaseItemRpc(Vector3 position, Quaternion rotation, Vector3 velocity) =>
-            _authority.TryRelease(OwnerClientId, position, rotation, velocity);
-         
+        private void ReleaseItemRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+        {
+            // A drop is sent with zero velocity; only a confirmed throw counts for stats.
+            if (_authority.TryRelease(OwnerClientId, position, rotation, velocity) && velocity != Vector3.zero)
+                ItemThrownRpc();
+        }
+
+        // The host confirms the event, but only the thrower can write its own Steam stats.
+        [Rpc(SendTo.Owner)]
+        private void ItemThrownRpc() => _achievements.ReportItemThrown();
+
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
         private void DeleteItemRpc() => _authority.TryDelete(OwnerClientId);
         #endregion

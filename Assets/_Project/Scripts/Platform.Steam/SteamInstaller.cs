@@ -21,7 +21,10 @@ namespace Game.Platform.Steam
             builder.RegisterInstance(transport); 
             builder.RegisterEntryPoint<SteamLobbyService>().AsSelf();
             builder.Register<SteamTransportAdapter>(Lifetime.Singleton).As<ITransportAdapter>();
-            builder.RegisterEntryPoint<SteamLobbySync>();
+            builder.RegisterEntryPoint<SteamLobbySync>(); 
+            
+            builder.RegisterEntryPoint<SteamAchievementService>();
+            builder.RegisterEntryPoint<SteamRichPresence>();
         }
     }
 }
