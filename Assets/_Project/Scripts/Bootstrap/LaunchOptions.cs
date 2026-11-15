@@ -9,6 +9,7 @@ namespace Game.Bootstrap
     {
         public string PlayerName { get; private set; }
         public ushort Port { get; private set; } = UtpTransportAdapter.DefaultPort;
+        public TransportKind? Transport { get; private set; }
 
         public static LaunchOptions FromCommandLine() => Parse(Environment.GetCommandLineArgs());
 
@@ -28,6 +29,14 @@ namespace Game.Bootstrap
                     case "-port":
                         if (ushort.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out ushort port))
                             options.Port = port;
+                        break;
+                    case "-transport":
+                        options.Transport = value.ToLowerInvariant() switch
+                        {
+                            "steam" => TransportKind.Steam,
+                            "ip" => TransportKind.UnityTransport,
+                            _ => options.Transport
+                        };
                         break;
                 }
             }

@@ -4,6 +4,7 @@ using Game.Net.Connection;
 using Game.Net.Injection;
 using Game.Net.Session;
 using Game.Platform.Local;
+using Game.Platform.Steam;
 using Game.Shared.Interface;
 using Game.Transport.Utp;
 using Game.UI.Loading;
@@ -25,6 +26,10 @@ namespace Game.Bootstrap
         [SerializeField] private LoadingScreenView _loadingScreenView;
         [SerializeField] private InputActionAsset _inputActions;
         [SerializeField] private ItemSettings _itemSettings;
+
+        // Command line (-transport) overrides it. Keep UnityTransport for Multiplayer Play Mode:
+        // all editor instances share one Steam account and would be rejected as duplicates.
+        [SerializeField] private TransportKind _defaultTransport = TransportKind.UnityTransport;
         protected override void Awake()
         {
             // Lives for the whole session; scene scopes use it as their parent 
@@ -40,7 +45,14 @@ namespace Game.Bootstrap
             builder.RegisterComponent(_networkManager);
             builder.RegisterInstance(_networkSettings);
 
-            RegisterPlatform(builder, options);
+            bool useSteam = TryInitSteam(options, out SteamPlatform steam, out string notice);
+            builder.RegisterInstance<IPlatformInfo>(new PlatformInfo(useSteam, notice));
+
+            if (useSteam)
+                RegisterSteamPlatform(builder, steam);
+            else
+                RegisterLocalPlatform(builder, options);
+
             RegisterTransport(builder, options);
 
             builder.Register<ConnectionApprovalHandler>(Lifetime.Singleton);
@@ -61,7 +73,35 @@ namespace Game.Bootstrap
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }
 
-        private static void RegisterPlatform(IContainerBuilder builder, LaunchOptions options)
+        private bool TryInitSteam(LaunchOptions options, out SteamPlatform steam, out string notice)
+        {
+            steam = null;
+            notice = string.Empty;
+
+            if ((options.Transport ?? _defaultTransport) != TransportKind.Steam) return false;
+
+            var platform = new SteamPlatform();
+
+            if (platform.TryInit(out string error))
+            {
+                steam = platform;
+                return true;
+            }
+
+            // Required by the task: without Steam the build must not crash, it falls back to direct IP.
+            notice = $"{error}. Using direct IP connect";
+            Debug.LogWarning($"[Steam] {notice}");
+            return false;
+        }
+
+        private static void RegisterSteamPlatform(IContainerBuilder builder, SteamPlatform steam)
+        {
+            builder.RegisterInstance(steam);
+            builder.RegisterEntryPoint<SteamCallbackPump>();
+            builder.Register<SteamIdentityProvider>(Lifetime.Singleton).As<IPlayerIdentityProvider>();
+        } 
+
+        private static void RegisterLocalPlatform(IContainerBuilder builder, LaunchOptions options)
         {
             builder.Register<GuidIdentityProvider>(Lifetime.Singleton)
                 .As<IPlayerIdentityProvider>()

@@ -11,12 +11,13 @@ namespace Game.UI.Menu
     {
         private const int DefaultMaxPlayers = 4;
         private readonly MenuView _view;
-        private readonly IConnectionService _connection; 
-
-        public MenuPresenter(MenuView view, IConnectionService connection)
+        private readonly IConnectionService _connection;
+        private readonly IPlatformInfo _platform;
+        public MenuPresenter(MenuView view, IConnectionService connection, IPlatformInfo platform)
         {
             _view = view;
             _connection = connection;
+            _platform = platform;
         }
 
         public void Start()
@@ -71,7 +72,9 @@ namespace Game.UI.Menu
             {
                 ConnectionState.Connecting => "Connecting...",
                 ConnectionState.Connected => _connection.IsHost ? "Hosting" : "Connected",
-                _ => DisconnectReasonText.Get(_connection.LastDisconnectReason)
+                _ => _connection.LastDisconnectReason != DisconnectReason.None
+                ? DisconnectReasonText.Get(_connection.LastDisconnectReason)
+                : _platform.StartupNotice
             });
         }
     }
