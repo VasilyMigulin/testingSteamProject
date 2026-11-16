@@ -702,7 +702,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Multiplayer.Tools.NetworkSimulator.Runtime::Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulator
   m_PresetAsset: {fileID: 0}
   m_PresetReference:
-    rid: 8998941180542320711
+    rid: 8998941180542320715
   m_Scenario:
     rid: -2
   m_IsScenarioSettingsFolded: 0
@@ -712,7 +712,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 8998941180542320711
+    - rid: 8998941180542320715
       type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
       data:
         <Name>k__BackingField: None
@@ -957,7 +957,7 @@ MonoBehaviour:
   _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _itemSettings: {fileID: 11400000, guid: 0ea47393ae057964cbd691ee4df0a202, type: 2}
   _editorTransport: 0
-  _buildTransport: 1
+  _buildTransport: 0
 --- !u!4 &1933918984
 Transform:
   m_ObjectHideFlags: 0
