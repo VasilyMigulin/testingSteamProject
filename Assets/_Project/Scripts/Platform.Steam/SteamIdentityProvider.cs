@@ -4,7 +4,7 @@ using Steamworks;
 namespace Game.Platform.Steam
 {
     // PlayerId is the SteamID, so approval's duplicate check works across machines and restarts.
-    public class SteamIdentityProvider : IPlayerIdentityProvider
+    public sealed class SteamIdentityProvider : IPlayerIdentityProvider
     { 
         public string PlayerId { get; }
         public string DisplayName { get; }

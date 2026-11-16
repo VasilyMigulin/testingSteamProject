@@ -590,6 +590,7 @@ GameObject:
   - component: {fileID: 1388393867}
   - component: {fileID: 1388393866}
   - component: {fileID: 1388393865}
+  - component: {fileID: 1388393869}
   - component: {fileID: 1388393868}
   m_Layer: 0
   m_Name: NetworkManager
@@ -701,7 +702,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Multiplayer.Tools.NetworkSimulator.Runtime::Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulator
   m_PresetAsset: {fileID: 0}
   m_PresetReference:
-    rid: 8998941149679583313
+    rid: 8998941180542320711
   m_Scenario:
     rid: -2
   m_IsScenarioSettingsFolded: 0
@@ -711,7 +712,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 8998941149679583313
+    - rid: 8998941180542320711
       type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
       data:
         <Name>k__BackingField: None
@@ -720,6 +721,20 @@ MonoBehaviour:
         <PacketJitterMs>k__BackingField: 0
         <PacketLossInterval>k__BackingField: 0
         <PacketLossPercent>k__BackingField: 0
+--- !u!114 &1388393869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1388393864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc4ccaff1920208429cca7c350560301, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SteamNetworkingSockets Transport for Netcode for GameObjects::Netcode.Transports.SteamNetworkingSocketsTransport
+  ConnectToSteamID: 0
+  options: []
 --- !u!1 &1885597740
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,6 +956,8 @@ MonoBehaviour:
   _loadingScreenView: {fileID: 1378539101}
   _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _itemSettings: {fileID: 11400000, guid: 0ea47393ae057964cbd691ee4df0a202, type: 2}
+  _editorTransport: 0
+  _buildTransport: 1
 --- !u!4 &1933918984
 Transform:
   m_ObjectHideFlags: 0
